@@ -13,7 +13,7 @@ const LeftSideBarToggle = () => {
       size: changeMenuSize
     },
     toggleBackdrop
-  } = useLayoutContext();
+  } = useLayoutContext() || {}; 
   const pathname = usePathname();
   const isFirstRender = useRef(true);
   const handleMenuSize = () => {

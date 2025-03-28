@@ -21,7 +21,7 @@ const ProfileDropdown = () => {
       </DropdownToggle>
       <DropdownMenu className="dropdown-menu-end">
         <DropdownHeader as={'h6'} className="dropdown-header">
-          Welcome Gaston!
+          Welcome 
         </DropdownHeader>
         <DropdownItem as={Link} href="/profile">
           <IconifyIcon icon="solar:calendar-broken" className="align-middle me-2 fs-18" />

@@ -7,6 +7,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { Collapse } from 'react-bootstrap';
+import { MENU_ITEMS } from '@/assets/data/menu-items';
+export const getMenuItems = () => {
+  return MENU_ITEMS;
+};
+
+
+
 const MenuItemWithChildren = ({
   item,
   className,
@@ -16,9 +23,11 @@ const MenuItemWithChildren = ({
   toggleMenu
 }) => {
   const [open, setOpen] = useState(activeMenuItems.includes(item.key));
+
   useEffect(() => {
     setOpen(activeMenuItems.includes(item.key));
   }, [activeMenuItems, item]);
+
   const toggleMenuItem = e => {
     e.preventDefault();
     const status = !open;
@@ -26,73 +35,102 @@ const MenuItemWithChildren = ({
     if (toggleMenu) toggleMenu(item, status);
     return false;
   };
-  const getActiveClass = useCallback(item => {
-    return activeMenuItems?.includes(item.key) ? 'active' : '';
-  }, [activeMenuItems]);
-  return <li className={className}>
+
+  const getActiveClass = useCallback(
+    item => (activeMenuItems?.includes(item.key) ? 'active' : ''),
+    [activeMenuItems]
+  );
+
+  return (
+    <li className={className}>
       <div onClick={toggleMenuItem} aria-expanded={open} role="button" className={clsx(linkClassName)}>
-        {item.icon && <span className="nav-icon">
-            {' '}
-            <IconifyIcon icon={item.icon} />{' '}
-          </span>}
+        {item.icon && (
+          <span className="nav-icon">
+            <IconifyIcon icon={item.icon} />
+          </span>
+        )}
         <span className="nav-text">{item.label}</span>
-        {!item.badge ? <IconifyIcon icon="bx:chevron-down" className="menu-arrow ms-auto" /> : <span className={`badge badge-pill text-end bg-${item.badge.variant}`}>{item.badge.text}</span>}
+        {!item.badge ? (
+          <IconifyIcon icon="bx:chevron-down" className="menu-arrow ms-auto" />
+        ) : (
+          <span className={`badge badge-pill text-end bg-${item.badge.variant}`}>{item.badge.text}</span>
+        )}
       </div>
       <Collapse in={open}>
         <div>
           <ul className={clsx(subMenuClassName)}>
-            {(item.children || []).map((child, idx) => {
-            return <Fragment key={child.key + idx}>
-                  {child.children ? <MenuItemWithChildren item={child} linkClassName={clsx('nav-link', getActiveClass(child))} activeMenuItems={activeMenuItems} className="sub-nav-item" subMenuClassName="nav sub-navbar-nav" toggleMenu={toggleMenu} /> : <MenuItem item={child} className="sub-nav-item" linkClassName={clsx('sub-nav-link', getActiveClass(child))} />}
-                </Fragment>;
-          })}
+            {(item.children || []).map((child, idx) => (
+              <Fragment key={child.key + idx}>
+                {child.children ? (
+                  <MenuItemWithChildren
+                    item={child}
+                    linkClassName={clsx('nav-link', getActiveClass(child))}
+                    activeMenuItems={activeMenuItems}
+                    className="sub-nav-item"
+                    subMenuClassName="nav sub-navbar-nav"
+                    toggleMenu={toggleMenu}
+                  />
+                ) : (
+                  <MenuItem
+                    item={child}
+                    className="sub-nav-item"
+                    linkClassName={clsx('sub-nav-link', getActiveClass(child))}
+                  />
+                )}
+              </Fragment>
+            ))}
           </ul>
         </div>
       </Collapse>
-    </li>;
+    </li>
+  );
 };
-const MenuItem = ({
-  item,
-  className,
-  linkClassName
-}) => {
-  return <li className={className}>
+
+const MenuItem = ({ item, className, linkClassName }) => {
+  return (
+    <li className={className}>
       <MenuItemLink item={item} className={linkClassName} />
-    </li>;
+    </li>
+  );
 };
-const MenuItemLink = ({
-  item,
-  className
-}) => {
-  return <Link href={item.url ?? ''} target={item.target} className={clsx(className, {
-    disabled: item.isDisabled
-  })}>
-      {item.icon && <span className="nav-icon">
+
+const MenuItemLink = ({ item, className }) => {
+  return (
+    <Link href={item.url ?? ''} target={item.target} className={clsx(className, { disabled: item.isDisabled })}>
+      {item.icon && (
+        <span className="nav-icon">
           <IconifyIcon icon={item.icon} />
-        </span>}
+        </span>
+      )}
       <span className="nav-text">{item.label}</span>
       {item.badge && <span className={`badge badge-pill text-end bg-${item.badge.variant}`}>{item.badge.text}</span>}
-    </Link>;
+    </Link>
+  );
 };
-const AppMenu = ({
-  menuItems
-}) => {
+
+const AppMenu = ({ menuItems }) => {
   const pathname = usePathname();
   const [activeMenuItems, setActiveMenuItems] = useState([]);
+
   const toggleMenu = (menuItem, show) => {
     if (show) setActiveMenuItems([menuItem.key, ...findAllParent(menuItems, menuItem)]);
   };
-  const getActiveClass = useCallback(item => {
-    return activeMenuItems?.includes(item.key) ? 'active' : '';
-  }, [activeMenuItems]);
+
+  const getActiveClass = useCallback(
+    item => (activeMenuItems?.includes(item.key) ? 'active' : ''),
+    [activeMenuItems]
+  );
+
   const activeMenu = useCallback(() => {
     const trimmedURL = pathname?.replaceAll('', '');
     const matchingMenuItem = getMenuItemFromURL(menuItems, trimmedURL);
+
     if (matchingMenuItem) {
       const activeMt = findMenuItem(menuItems, matchingMenuItem.key);
       if (activeMt) {
         setActiveMenuItems([activeMt.key, ...findAllParent(menuItems, activeMt)]);
       }
+
       setTimeout(() => {
         const activatedItem = document.querySelector(`#leftside-menu-container .simplebar-content a[href="${trimmedURL}"]`);
         if (activatedItem) {
@@ -103,42 +141,77 @@ const AppMenu = ({
           }
         }
       }, 400);
-
-      // scrollTo (Left Side Bar Active Menu)
-      const easeInOutQuad = (t, b, c, d) => {
-        t /= d / 2;
-        if (t < 1) return c / 2 * t * t + b;
-        t--;
-        return -c / 2 * (t * (t - 2) - 1) + b;
-      };
-      const scrollTo = (element, to, duration) => {
-        const start = element.scrollTop,
-          change = to - start,
-          increment = 20;
-        let currentTime = 0;
-        const animateScroll = function () {
-          currentTime += increment;
-          const val = easeInOutQuad(currentTime, start, change, duration);
-          element.scrollTop = val;
-          if (currentTime < duration) {
-            setTimeout(animateScroll, increment);
-          }
-        };
-        animateScroll();
-      };
     }
   }, [pathname, menuItems]);
+
   useEffect(() => {
-    if (menuItems && menuItems.length > 0) activeMenu();
+
+    if (Array.isArray(menuItems) && menuItems.length > 0) activeMenu();
   }, [activeMenu, menuItems]);
-  return <ul className="navbar-nav" id="navbar-nav">
-      {(menuItems || []).map((item, idx) => {
-      return <Fragment key={item.key + idx}>
-            {item.isTitle ? <li className={clsx('menu-title')}>{item.label}</li> : <>
-                {item.children ? <MenuItemWithChildren item={item} toggleMenu={toggleMenu} className="nav-item" linkClassName={clsx('nav-link menu-arrow', getActiveClass(item))} subMenuClassName="nav sub-navbar-nav" activeMenuItems={activeMenuItems} /> : <MenuItem item={item} linkClassName={clsx('nav-link', getActiveClass(item))} className="nav-item" />}
-              </>}
-          </Fragment>;
-    })}
-    </ul>;
+
+  return (
+    <ul className="navbar-nav" id="navbar-nav">
+      {Array.isArray(menuItems) && menuItems.length > 0 ? (
+        menuItems.map((item, idx) => (
+          <Fragment key={item.key + idx}>
+            {item.isTitle ? (
+              <li className={clsx('menu-title')}>{item.label}</li>
+            ) : (
+              <>
+                {item.children ? (
+                  <MenuItemWithChildren
+                    item={item}
+                    toggleMenu={toggleMenu}
+                    className="nav-item"
+                    linkClassName={clsx('nav-link menu-arrow', getActiveClass(item))}
+                    subMenuClassName="nav sub-navbar-nav"
+                    activeMenuItems={activeMenuItems}
+                  />
+                ) : (
+                  <MenuItem
+                    item={item}
+                    linkClassName={clsx('nav-link', getActiveClass(item))}
+                    className="nav-item"
+                  />
+                )}
+              </>
+            )}
+          </Fragment>
+        ))
+      ) : (
+        <li className="menu-title">No menu items available</li>
+      )}
+    </ul>
+  );
 };
-export default AppMenu;
+
+
+const role = typeof window !== 'undefined' ? localStorage.getItem("role") : null;
+const menuItems = MENU_ITEMS[role] || [];
+
+
+export default function AppMenuWrapper() {
+  const [menuItems, setMenuItems] = useState([]);
+
+  useEffect(() => {
+    const role = localStorage.getItem('role');
+    const updatedMenu = MENU_ITEMS[role] || [];
+    setMenuItems(updatedMenu);
+  }, []);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const role = localStorage.getItem('role');
+      const updatedMenu = MENU_ITEMS[role] || [];
+      setMenuItems(updatedMenu);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  return <AppMenu menuItems={menuItems} />;
+}

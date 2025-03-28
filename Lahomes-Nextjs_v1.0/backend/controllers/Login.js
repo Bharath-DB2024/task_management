@@ -1,6 +1,10 @@
-const db = require("../config/db");
-const bcrypt = require("bcryptjs");
+const cryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
+const db = require("../config/db"); 
+
+
+
+const secretKey = "DB PRODUCTIONS"; 
 
 
 
@@ -35,19 +39,23 @@ exports.post = (req, res) => {
   };
 
   const processLogin = async () => {
-    const isMatch = await bcrypt.compare(password, foundUser.password);
-    console.log(isMatch)
-    if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
-  
+
+    const decryptedPassword = cryptoJS.AES.decrypt(foundUser.password, secretKey).toString(cryptoJS.enc.Utf8);
+
+    if (password !== decryptedPassword) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
     const tokenPayload = {
       id: foundUser.id,
       email: foundUser.email,
+      name: foundUser.name,
       role: userRole,
     };
-  
+
     let uniqueIdKey = null;
     let uniqueIdValue = null;
-  
+
     if (userRole === "admin") {
       uniqueIdKey = "unique_id";
       uniqueIdValue = foundUser.unique_id;
@@ -58,17 +66,17 @@ exports.post = (req, res) => {
       uniqueIdKey = "student_unique_id";
       uniqueIdValue = foundUser.unique_id;
     }
-  
-    const token = jwt.sign(tokenPayload, "dbproductions", { expiresIn: "1m" });
-        
-    return res.json({ 
-      message: "Login successful", 
-      token, 
-      role: userRole, 
-      [uniqueIdKey]: uniqueIdValue
+
+    const token = jwt.sign(tokenPayload, "dbproductions", { expiresIn: "1h" });
+
+    return res.json({
+      message: "Login successful",
+      token,
+      name: foundUser.name,
+      role: userRole,
+      [uniqueIdKey]: uniqueIdValue,
     });
   };
-  
 
   checkNextRole(0);
 };

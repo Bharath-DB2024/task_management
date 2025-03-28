@@ -12,6 +12,7 @@ const ThemeCustomizerToggle = () => {
       toggle
     }
   } = useLayoutContext();
+
   const [hasOpenedOnce, setHasOpenedOnce] = useState(open);
   const toggleThemeCustomizerOffcanvas = () => {
     if (!hasOpenedOnce) setHasOpenedOnce(true);
@@ -20,7 +21,7 @@ const ThemeCustomizerToggle = () => {
   return <>
       <div className="topbar-item d-none d-md-flex">
         <button onClick={toggleThemeCustomizerOffcanvas} type="button" className="topbar-button" id="theme-settings-btn" data-bs-toggle="offcanvas" data-bs-target="#theme-settings-offcanvas" aria-controls="theme-settings-offcanvas">
-          <IconifyIcon icon="ri:settings-4-line" className=" fs-24" />
+          {/* <IconifyIcon icon="ri:settings-4-line" className=" fs-24" /> */}
         </button>
       </div>
       {hasOpenedOnce && <ThemeCustomizer open={open} toggle={toggleThemeCustomizerOffcanvas} />}

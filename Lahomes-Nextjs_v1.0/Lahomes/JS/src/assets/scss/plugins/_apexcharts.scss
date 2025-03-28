@@ -37,7 +37,7 @@
 }
 
 .apexcharts-legend-text {
-    color: $text-muted !important;
+    color: $text-muted ;
 }
 
 
@@ -96,13 +96,13 @@
 }
 
 .apexcharts-legend-text {
-    color: var(--#{$prefix}body-color) !important;
-    font-family: $font-family-base !important;
-    font-size: 13px !important;
+    color: var(--#{$prefix}body-color) ;
+    font-family: $font-family-base ;
+    font-size: 15px !important ;
 }
 
 .apexcharts-pie-label {
-    fill: $white !important;
+    fill: $white ;
 }
 
 .apexcharts-title-text,
@@ -116,6 +116,7 @@
     text {
         font-family: $font-family-base !important;
         fill: var(--#{$prefix}link-color);
+        font-size: 15px !important;
     }
 }
 

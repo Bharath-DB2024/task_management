@@ -21,9 +21,11 @@ const HoverMenuToggle = () => {
       if (size !== 'hidden') changeMenuSize('hidden');
     }
   }, [width]);
+
   const handleHoverMenu = () => {
     if (size === 'sm-hover-active') changeMenuSize('sm-hover');else changeMenuSize('sm-hover-active');
   };
+
   return <button type="button" onClick={handleHoverMenu} className="button-sm-hover" aria-label="Show Full Sidebar">
       <IconifyIcon height={24} width={24} icon="ri:menu-2-line" className="button-sm-hover-icon" />
     </button>;

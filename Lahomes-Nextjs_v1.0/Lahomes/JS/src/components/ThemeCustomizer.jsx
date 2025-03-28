@@ -1,9 +1,12 @@
+
+
 'use client';
 
 import { Button, Col, Offcanvas, OffcanvasBody, OffcanvasHeader, Row } from 'react-bootstrap';
 import { useLayoutContext } from '@/context/useLayoutContext';
 import { toSentenceCase } from '@/utils/change-casing';
 import SimplebarReactClient from './wrappers/SimplebarReactClient';
+
 const ColorScheme = () => {
   const {
     theme,
@@ -20,6 +23,7 @@ const ColorScheme = () => {
         </div>)}
     </div>;
 };
+
 const TopbarTheme = () => {
   const {
     topbarTheme,
@@ -36,6 +40,7 @@ const TopbarTheme = () => {
         </div>)}
     </div>;
 };
+
 const MenuTheme = () => {
   const {
     menu: {
@@ -45,7 +50,9 @@ const MenuTheme = () => {
       theme: changeMenuTheme
     }
   } = useLayoutContext();
+
   const modes = ['light', 'dark'];
+  
   return <div>
       <h5 className="my-3 font-16 fw-semibold">Menu Color</h5>
       {modes.map((mode, idx) => <div key={idx + mode + idx} className="form-check mb-2">
@@ -56,6 +63,7 @@ const MenuTheme = () => {
         </div>)}
     </div>;
 };
+
 const SidebarSize = () => {
   const {
     menu: {
@@ -91,6 +99,7 @@ const SidebarSize = () => {
         </div>)}
     </div>;
 };
+
 const ThemeCustomizer = ({
   open,
   toggle
@@ -113,7 +122,7 @@ const ThemeCustomizer = ({
 
               {theme === 'light' && <MenuTheme />}
 
-              <SidebarSize />
+              {/* <SidebarSize /> */}
             </div>
           </SimplebarReactClient>
         </OffcanvasBody>

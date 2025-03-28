@@ -3,6 +3,7 @@
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { useLayoutContext } from '@/context/useLayoutContext';
 import React from 'react';
+
 const ThemeModeToggle = () => {
   const {
     theme,
@@ -15,4 +16,5 @@ const ThemeModeToggle = () => {
       </button>
     </div>;
 };
+
 export default ThemeModeToggle;

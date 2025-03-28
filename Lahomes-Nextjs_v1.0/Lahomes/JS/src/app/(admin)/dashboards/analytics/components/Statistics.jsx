@@ -1,44 +1,69 @@
 'use client';
 
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import ReactApexChart from 'react-apexcharts';
 import { Card, CardBody, Col, Row } from 'react-bootstrap';
-import { chartOptions, statisticData } from '../data';
-const StatCard = ({
-  amount,
-  change,
-  icon,
-  title,
-  variant
-}) => {
-  return <Card>
-      <CardBody>
-        <Row className="align-items-center justify-content-between">
-          <Col xs={6}>
-            <div className="avatar-md bg-light bg-opacity-50 rounded flex-centered">
-              <IconifyIcon width={32} height={32} icon={icon} className="text-primary" />
-            </div>
-            <p className="text-muted mb-2 mt-3">{title}</p>
-            <h3 className="text-dark fw-bold d-flex align-items-center gap-2 mb-0">
-              {amount}{' '}
-              <span className={`badge text-${variant == 'danger' ? 'danger' : 'success'} bg-${variant == 'danger' ? 'danger' : 'success'}-subtle fs-12`}>
-                {variant == 'danger' ? <IconifyIcon icon="ri:arrow-down-line" /> : <IconifyIcon icon="ri:arrow-up-line" />}
-                {change}%
-              </span>
-            </h3>
-          </Col>
-          <Col xs={6}>
-            <ReactApexChart options={chartOptions} series={chartOptions.series} height={95} type="bar" className="apex-charts" />
-          </Col>
-        </Row>
-      </CardBody>
-    </Card>;
-};
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import Image from 'next/image';
+import instIcon from '../../../icons/Instructor.svg';
+import stuIcon from '../../../icons/Student.svg';
+import groupIcon from '../../../icons/Group.svg';
+import completeIcon from '../../../icons/Task completed.svg';
+
 const Statistics = () => {
-  return <Row>
-      {statisticData.map((item, idx) => <Col md={6} xl={3} key={idx}>
-          <StatCard {...item} />
-        </Col>)}
-    </Row>;
+  const [stats, setStats] = useState({
+    totalInstructors: 0,
+    totalStudents: 0,
+    totalGroups: 0,
+    completedTasks: 0,
+  });
+
+  useEffect(() => {
+    const userId = localStorage.getItem('admin_unique_id');   
+    const role = localStorage.getItem('role');
+
+    if (!userId || !role) {
+        console.error('User ID or role not found');
+        return;
+    }
+
+    axios
+        .post('http://localhost:5000/getTotal', { role, userId })
+        .then((response) => {
+            setStats(response.data);
+        })
+        .catch((error) => {
+            console.error('Error fetching statistics:', error);
+        });
+  }, []);
+
+  return (
+    <div className="container-fluid px-4">
+      <Row className="d-flex justify-content-between">
+        {[
+          { label: "Instructors", count: stats.totalInstructors, icon: instIcon },
+          { label: "Students", count: stats.totalStudents, icon: stuIcon },
+          { label: "Groups", count: stats.totalGroups, icon: groupIcon },
+          { label: "Task", count: stats.completedTasks, icon: completeIcon },
+        ].map((item, index) => (
+          <Col key={index} xs={12} sm={6} md={3} className="d-flex">
+            <Card className="shadow-sm flex-grow-1 h-85">
+              <CardBody className="d-flex align-items-center justify-content-between p-2">
+             
+                <div>
+                  <h4>{item.label}</h4>
+                  <h1 className="text-dark fw-bold">{item.count}</h1> 
+                </div>
+
+                <div>
+                  <Image src={item.icon} width={90} height={100} style={{ opacity: 0.8 }}alt={`${item.label} Icon`} />
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </div>
+  );
 };
+
 export default Statistics;

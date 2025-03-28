@@ -1,3 +1,4 @@
+
 'use client';
 
 import { createContext, use, useCallback, useEffect, useMemo, useState } from 'react';
@@ -12,6 +13,7 @@ const useLayoutContext = () => {
   }
   return context;
 };
+
 const getPreferredTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 const LayoutProvider = ({
   children
@@ -64,14 +66,42 @@ const LayoutProvider = ({
   };
 
   // change menu theme
+  // const changeMenuSize = newSize => {
+  //   updateSettings({
+  //     menu: {
+  //       ...settings.menu,
+  //       size: newSize
+  //     }
+  //   });
+  // };
+
+
   const changeMenuSize = newSize => {
     updateSettings({
       menu: {
         ...settings.menu,
-        size: newSize
+        size: window.innerWidth <= 768 ? "hidden" : newSize
       }
     });
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setSettings(prevSettings => ({
+        ...prevSettings,
+        menu: {
+          ...prevSettings.menu,
+          size: window.innerWidth <= 768 ? "hidden" : "default"
+        }
+      }));
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); 
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
 
   // toggle theme customizer offcanvas
   const toggleThemeCustomizer = () => {
